@@ -1,24 +1,29 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Main {
+    public static final int MILLIS = 1000;
+    public static final int SIZE = 3;
     public static void main(String[] args) throws InterruptedException {
         CallCenter callCenter = new CallCenter();
 
         Thread atc = new Thread(null, callCenter::workATC, "АТС");
 
-        Thread operator1 = new Thread(null, callCenter::workByOperator, "Специалист 1");
-        Thread operator2 = new Thread(null, callCenter::workByOperator, "Специалист 2");
-        Thread operator3 = new Thread(null, callCenter::workByOperator, "Специалист 3");
+        List<Thread> operators = new ArrayList<>(3);
+        for (int i = 1; i <= SIZE; i++) {
+            operators.add(new Thread(null, callCenter::workByOperator, "Специалист " + i));
+        }
 
         atc.start();
 
-        operator1.start();
-        Thread.sleep(1000);
-        operator2.start();
-        Thread.sleep(1000);
-        operator3.start();
+        for (Thread thread : operators) {
+            thread.start();
+            Thread.sleep(MILLIS);
+        }
 
         atc.join();
-        operator1.join();
-        operator2.join();
-        operator3.join();
+        for (Thread thread : operators) {
+            thread.join();
+        }
     }
 }
